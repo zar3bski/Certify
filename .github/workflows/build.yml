@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore Certify.sln
+
+      - name: Build
+        run: msbuild Certify.sln /p:Configuration=Release /p:Platform="Any CPU"
+          /p:TargetFrameworkVersion=v4.7.2
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Certify
+          path: Certify/bin/Release/Certify.exe
